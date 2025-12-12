@@ -1,72 +1,28 @@
 <script lang="ts">
   import { innerHeight, innerWidth } from "svelte/reactivity/window";
-  import image from "./assets/svelte.svg";
   import { onDestroy } from "svelte";
+  import { Direction } from "./lib/definitions";
+  import Player from "./lib/Player.svelte";
 
-  type Coordinate = {
-    x: number;
-    y: number;
-  };
-
-  const NORTH = "NORTH";
-  const EAST = "EAST";
-  const SOUTH = "SOUTH";
-  const WEST = "WEST";
-  const height = $state(innerHeight.current);
-  const width = $state(innerWidth.current);
-
-  let curDirection: string = $state(EAST);
-  let posX = $state(width / 2);
-  let posY = $state(height / 2);
+  let curDirection: Direction = $state(Direction.North);
   let ongoingGame: boolean = $state(true);
   let score: number = 0;
-
-  function calculateNewPos(x: number, y: number, direction: string): Coordinate {
-    let coordinates: Coordinate;
-
-    switch (direction) {
-      case NORTH:
-        coordinates = { x, y: y - 10 };
-        break;
-      case EAST:
-        coordinates = { x: x + 10, y };
-        break;
-      case SOUTH:
-        coordinates = { x, y: y + 10 };
-        break;
-      case WEST:
-        coordinates = { x: x - 10, y };
-        break;
-      default:
-        throw new Error("Unknown direction used to calculate new position.");
-    }
-
-    return coordinates;
-  }
-
-  function move(): void {
-    score++;
-    const { x, y } = calculateNewPos(posX, posY, curDirection);
-    console.log(`x: ${x}, y: ${y}`);
-    posX = x;
-    posY = y;
-  }
 
   function keyHandler(event) {
     const keyName = event.key;
 
     switch (keyName) {
       case "ArrowUp":
-        curDirection = NORTH;
+        curDirection = Direction.North;
         break;
       case "ArrowRight":
-        curDirection = EAST;
+        curDirection = Direction.East;
         break;
       case "ArrowDown":
-        curDirection = SOUTH;
+        curDirection = Direction.South;
         break;
       case "ArrowLeft":
-        curDirection = WEST;
+        curDirection = Direction.West;
         break;
     }
   }
@@ -74,13 +30,13 @@
   function startGame(): number {
     document.addEventListener("keydown", (event) => keyHandler(event));
 
-    const moveInterval: number = setInterval(() => {
+    const scoreInterval: number = setInterval(() => {
       if (!ongoingGame) {
-        clearInterval(moveInterval);
+        clearInterval(scoreInterval);
         console.log("Interval stopped on destroy.");
       }
 
-      move();
+      score++;
     }, 1000);
 
     return score;
@@ -94,16 +50,10 @@
 </script>
 
 <main id="main">
-  <img src={image} style={`top: ${posY}px; left: ${posX}px;`} />
+  <Player {curDirection} />
 </main>
 
 <style>
-  img {
-    width: full;
-    height: full;
-    position: absolute;
-  }
-
   main {
     height: 100vh;
     width: 100vw;
