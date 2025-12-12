@@ -15,7 +15,6 @@
   const height = $state(innerHeight.current);
   const width = $state(innerWidth.current);
 
-  let img: HTMLImageElement | undefined = $state();
   let curDirection: string = $state(EAST);
   let posX = $state(width / 2);
   let posY = $state(height / 2);
@@ -27,13 +26,13 @@
 
     switch (direction) {
       case NORTH:
-        coordinates = { x, y: y + 10 };
+        coordinates = { x, y: y - 10 };
         break;
       case EAST:
         coordinates = { x: x + 10, y };
         break;
       case SOUTH:
-        coordinates = { x, y: y - 10 };
+        coordinates = { x, y: y + 10 };
         break;
       case WEST:
         coordinates = { x: x - 10, y };
@@ -53,13 +52,45 @@
     posY = y;
   }
 
-  const moveInterval: number = setInterval(move, 1000);
-  console.log("Move started.");
+  function keyHandler(event) {
+    const keyName = event.key;
+
+    switch (keyName) {
+      case "ArrowUp":
+        curDirection = NORTH;
+        break;
+      case "ArrowRight":
+        curDirection = EAST;
+        break;
+      case "ArrowDown":
+        curDirection = SOUTH;
+        break;
+      case "ArrowLeft":
+        curDirection = WEST;
+        break;
+    }
+  }
+
+  function startGame(): number {
+    document.addEventListener("keydown", (event) => keyHandler(event));
+
+    const moveInterval: number = setInterval(() => {
+      if (!ongoingGame) {
+        clearInterval(moveInterval);
+        console.log("Interval stopped on destroy.");
+      }
+
+      move();
+    }, 1000);
+
+    return score;
+  }
 
   onDestroy(() => {
-    clearInterval(moveInterval);
-    console.log("Interval stopped on destroy.");
+    ongoingGame = false;
   });
+
+  startGame();
 </script>
 
 <main id="main">
