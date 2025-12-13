@@ -21,9 +21,10 @@
   let posX = $state(width / 2);
   let posY = $state(height / 2);
 
-  let imgLengthPx = $derived(() => document.getElementById("image").clientHeight);
+  let imgLengthPx = $derived.by(() => document.getElementById("image").clientHeight);
+
   $effect(() => {
-    console.log("imgLengthPx", imgLengthPx());
+    console.log("imgLengthPx", imgLengthPx);
     console.log("height", height);
   });
 
@@ -100,7 +101,7 @@
 </script>
 
 <main id="main">
-  <Player {posX} {posY} />
+  <Player {posX} {posY} length={(height / 20) ?? 50} />
 </main>
 
 <style>
