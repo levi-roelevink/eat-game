@@ -3,6 +3,7 @@
   import { onDestroy } from "svelte";
   import { Direction, type Coordinate } from "./lib/definitions";
   import Player from "./lib/Player.svelte";
+  import Score from "./lib/Score.svelte";
 
   const height = $state(innerHeight.current);
   const width = $state(innerWidth.current);
@@ -15,14 +16,14 @@
 
   // Game variables
   let ongoingGame: boolean = $state(true);
-  let score: number = 0;
+  let score: number = $state(0);
 
   // Player variables
   let curDirection: Direction = $state(Direction.North);
   let posX = $state(width / 2);
   let posY = $state(height / 2);
 
-  function keyHandler(event) {
+  function keyHandler(event: KeyboardEvent) {
     const keyName = event.key;
 
     switch (keyName) {
@@ -77,7 +78,6 @@
     if (!coordinatesWithinBounds) {
       // TODO: game over!
     }
-    console.log(`coordinates within bounds: ${coordinatesWithinBounds}`);
 
     return coordinates;
   }
@@ -113,6 +113,7 @@
 </script>
 
 <main id="main">
+  <Score {score} />
   <Player {posX} {posY} length={playerLength ?? 50} />
 </main>
 
