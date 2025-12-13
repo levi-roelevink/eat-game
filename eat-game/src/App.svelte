@@ -8,6 +8,8 @@
   const height = $state(innerHeight.current);
   const width = $state(innerWidth.current);
   const playerLength = $state(height / 20);
+  const initialPosX = width / 2;
+  const initialPosY = height / 2;
 
   const TOP_BOUNDARY = 0;
   const RIGHT_BOUNDARY = width;
@@ -16,12 +18,14 @@
 
   // Game variables
   let ongoingGame: boolean = $state(true);
+  let gameEnd: boolean = $state(false);
   let score: number = $state(0);
+  let highScore: number | undefined = $state();
 
   // Player variables
   let curDirection: Direction = $state(Direction.North);
-  let posX = $state(width / 2);
-  let posY = $state(height / 2);
+  let posX = $state(initialPosX);
+  let posY = $state(initialPosY);
 
   function keyHandler(event: KeyboardEvent) {
     const keyName = event.key;
@@ -76,7 +80,8 @@
 
     const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
     if (!coordinatesWithinBounds) {
-      // TODO: game over!
+      gameOver();
+      return { x: initialPosX, y: initialPosY };
     }
 
     return coordinates;
@@ -105,6 +110,17 @@
     return score;
   }
 
+  function gameOver() {
+    console.log(`Game over. Score: ${score}`);
+
+    gameEnd = true;
+    ongoingGame = false;
+
+    if (!highScore || score > highScore) {
+      highScore = score;
+    }
+  }
+
   onDestroy(() => {
     ongoingGame = false;
   });
@@ -113,7 +129,7 @@
 </script>
 
 <main id="main">
-  <Score {score} />
+  <Score {score} {highScore} />
   <Player {posX} {posY} length={playerLength ?? 50} />
 </main>
 
