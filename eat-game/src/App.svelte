@@ -6,6 +6,7 @@
 
   const height = $state(innerHeight.current);
   const width = $state(innerWidth.current);
+  const playerLength = $state(height / 20);
 
   const TOP_BOUNDARY = 0;
   const RIGHT_BOUNDARY = width;
@@ -20,13 +21,6 @@
   let curDirection: Direction = $state(Direction.North);
   let posX = $state(width / 2);
   let posY = $state(height / 2);
-
-  let imgLengthPx = $derived.by(() => document.getElementById("image").clientHeight);
-
-  $effect(() => {
-    console.log("imgLengthPx", imgLengthPx);
-    console.log("height", height);
-  });
 
   function keyHandler(event) {
     const keyName = event.key;
@@ -45,6 +39,18 @@
         curDirection = Direction.West;
         break;
     }
+  }
+
+  function checkCoordinatesWithinBounds(coordinates: Coordinate): boolean {
+    if (!coordinates) {
+      return false;
+    } else if (coordinates.x < LEFT_BOUNDARY || coordinates.x > RIGHT_BOUNDARY - playerLength) {
+      return false;
+    } else if (coordinates.y < TOP_BOUNDARY || coordinates.y > BOTTOM_BOUNDARY - playerLength) {
+      return false;
+    }
+
+    return true;
   }
 
   function calculateNewPos(x: number, y: number, direction: Direction): Coordinate {
@@ -66,6 +72,12 @@
       default:
         throw new Error("Unknown direction used to calculate new position.");
     }
+
+    const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
+    if (!coordinatesWithinBounds) {
+      // TODO: game over!
+    }
+    console.log(`coordinates within bounds: ${coordinatesWithinBounds}`);
 
     return coordinates;
   }
@@ -101,7 +113,7 @@
 </script>
 
 <main id="main">
-  <Player {posX} {posY} length={(height / 20) ?? 50} />
+  <Player {posX} {posY} length={playerLength ?? 50} />
 </main>
 
 <style>
