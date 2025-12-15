@@ -10,7 +10,9 @@
   const playerLength = $state(height / 20);
   const initialPosX = width / 2;
   const initialPosY = height / 2;
+  const POSITION_JUMP = 10;
 
+  // Playing field boundaries
   const TOP_BOUNDARY = 0;
   const RIGHT_BOUNDARY = width;
   const LEFT_BOUNDARY = 0;
@@ -63,16 +65,16 @@
 
     switch (direction) {
       case Direction.North:
-        coordinates = { x, y: y - 10 };
+        coordinates = { x, y: y - POSITION_JUMP };
         break;
       case Direction.East:
-        coordinates = { x: x + 10, y };
+        coordinates = { x: x + POSITION_JUMP, y };
         break;
       case Direction.South:
-        coordinates = { x, y: y + 10 };
+        coordinates = { x, y: y + POSITION_JUMP };
         break;
       case Direction.West:
-        coordinates = { x: x - 10, y };
+        coordinates = { x: x - POSITION_JUMP, y };
         break;
       default:
         throw new Error("Unknown direction used to calculate new position.");
