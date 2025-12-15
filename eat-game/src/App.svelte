@@ -86,6 +86,8 @@
   function move(): void {
     const coordinates = calculateNewPos(posX, posY, curDirection);
 
+    // TODO: collision detection
+
     const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
     if (!coordinatesWithinBounds) {
       gameOver();
@@ -130,6 +132,7 @@
 <main id="main">
   <Score {score} {highScore} />
   <Player {posX} {posY} length={playerLength ?? 50} />
+  <!-- TODO: add obstacles to the map -->
 </main>
 
 <style>
