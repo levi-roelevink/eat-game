@@ -78,20 +78,19 @@
         throw new Error("Unknown direction used to calculate new position.");
     }
 
-    const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
-    if (!coordinatesWithinBounds) {
-      gameOver();
-      return { x: initialPosX, y: initialPosY };
-    }
-
     return coordinates;
   }
 
   function move(): void {
-    const { x, y } = calculateNewPos(posX, posY, curDirection);
-    console.log(`x: ${x}, y: ${y}`);
-    posX = x;
-    posY = y;
+    const coordinates = calculateNewPos(posX, posY, curDirection);
+
+    const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
+    if (!coordinatesWithinBounds) {
+      gameOver();
+    }
+
+    posX = coordinates.x;
+    posY = coordinates.y;
   }
 
   function startGame(): number {
@@ -111,8 +110,6 @@
   }
 
   function gameOver() {
-    console.log(`Game over. Score: ${score}`);
-
     gameEnd = true;
     ongoingGame = false;
 
