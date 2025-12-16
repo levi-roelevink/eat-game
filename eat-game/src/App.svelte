@@ -106,7 +106,8 @@
     const collision: boolean = checkCollision(playerCoordinates, targetCoordinates);
     if (collision) {
       score++;
-      // TODO: new target
+      // Set new target
+      targetCoordinates = getRandomCoordinates();
     }
 
     const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
@@ -126,7 +127,7 @@
     // Listen for user input (movement)
     document.addEventListener("keydown", (event) => keyHandler(event));
 
-    // 
+    //
     const moveInterval: number = setInterval(() => {
       if (!ongoingGame) {
         clearInterval(moveInterval);
