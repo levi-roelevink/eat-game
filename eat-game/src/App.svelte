@@ -50,18 +50,6 @@
     }
   }
 
-  function checkCoordinatesWithinBounds(coordinates: Coordinate): boolean {
-    if (!coordinates) {
-      return false;
-    } else if (coordinates.x < LEFT_BOUNDARY || coordinates.x > RIGHT_BOUNDARY - playerLength) {
-      return false;
-    } else if (coordinates.y < TOP_BOUNDARY || coordinates.y > BOTTOM_BOUNDARY - playerLength) {
-      return false;
-    }
-
-    return true;
-  }
-
   function calculateNewPos(c: Coordinate, direction: Direction): Coordinate {
     let coordinates: Coordinate;
 
@@ -85,12 +73,42 @@
     return coordinates;
   }
 
+  function checkCoordinatesWithinBounds(coordinates: Coordinate): boolean {
+    if (!coordinates) {
+      return false;
+    } else if (coordinates.x < LEFT_BOUNDARY || coordinates.x > RIGHT_BOUNDARY - playerLength) {
+      return false;
+    } else if (coordinates.y < TOP_BOUNDARY || coordinates.y > BOTTOM_BOUNDARY - playerLength) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function checkCollision(player: Coordinate, target: Coordinate): boolean {
+    const xDistance = player.x - target.x;
+    if (xDistance >= -playerLength && xDistance <= playerLength) {
+      // player's position on the x-axis overlaps with that of the target
+
+      const yDistance = player.y - target.y;
+      if (yDistance >= -playerLength && yDistance <= playerLength) {
+        // player's position on the y-axis also overlaps with that of the target
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   function move(): void {
     const coordinates = calculateNewPos(playerCoordinates, curDirection);
     playerCoordinates = coordinates;
-    console.log(`x: ${coordinates.x}, y: ${coordinates.y}`);
 
-    // TODO: collision detection
+    const collision: boolean = checkCollision(playerCoordinates, targetCoordinates);
+    if (collision) {
+      score++;
+      // TODO: new target
+    }
 
     const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
     if (!coordinatesWithinBounds) {
@@ -100,7 +118,7 @@
 
   function startGame(): number {
     document.addEventListener("keydown", (event) => keyHandler(event));
-    
+
     // Set initial target position
     targetCoordinates = getRandomCoordinates();
 
@@ -111,8 +129,7 @@
       }
 
       move();
-      score++;
-    }, 1000);
+    }, 250);
 
     return score;
   }
