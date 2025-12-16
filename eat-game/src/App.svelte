@@ -10,8 +10,7 @@
   const height = $state(innerHeight.current);
   const width = $state(innerWidth.current);
   const playerLength = $state(height / 20);
-  const initialPosX = width / 2;
-  const initialPosY = height / 2;
+  const initialCoordinates: Coordinate = { x: width / 2, y: height / 2 };
   const POSITION_JUMP = 10;
 
   // Playing field boundaries
@@ -28,7 +27,7 @@
 
   // Movement variables
   let curDirection: Direction = $state(Direction.North);
-  let playerCoordinates: Coordinate = $state({ x: initialPosX, y: initialPosY });
+  let playerCoordinates: Coordinate = $state(initialCoordinates);
   let targetCoordinates: Coordinate = $state({ x: 0, y: 0 });
 
   function keyHandler(event: KeyboardEvent) {
@@ -117,14 +116,20 @@
   }
 
   function startGame(): number {
+    // Set initial game state
+    targetCoordinates = getRandomCoordinates();
+    playerCoordinates = initialCoordinates;
+    ongoingGame = true;
+    gameEnd = false;
+    score = 0;
+
+    // Listen for user input (movement)
     document.addEventListener("keydown", (event) => keyHandler(event));
 
-    // Set initial target position
-    targetCoordinates = getRandomCoordinates();
-
-    const scoreInterval: number = setInterval(() => {
+    // 
+    const moveInterval: number = setInterval(() => {
       if (!ongoingGame) {
-        clearInterval(scoreInterval);
+        clearInterval(moveInterval);
         console.log("Interval stopped on destroy.");
       }
 
@@ -141,6 +146,9 @@
     if (!highScore || score > highScore) {
       highScore = score;
     }
+
+    window.alert(`Game Over!\nYour score was ${score}.`);
+    startGame();
   }
 
   function getRandomCoordinates(): Coordinate {
