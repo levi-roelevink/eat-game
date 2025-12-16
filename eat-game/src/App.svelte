@@ -10,7 +10,9 @@
   const playerLength = $state(height / 20);
   const initialPosX = width / 2;
   const initialPosY = height / 2;
+  const POSITION_JUMP = 10;
 
+  // Playing field boundaries
   const TOP_BOUNDARY = 0;
   const RIGHT_BOUNDARY = width;
   const LEFT_BOUNDARY = 0;
@@ -63,35 +65,36 @@
 
     switch (direction) {
       case Direction.North:
-        coordinates = { x, y: y - 10 };
+        coordinates = { x, y: y - POSITION_JUMP };
         break;
       case Direction.East:
-        coordinates = { x: x + 10, y };
+        coordinates = { x: x + POSITION_JUMP, y };
         break;
       case Direction.South:
-        coordinates = { x, y: y + 10 };
+        coordinates = { x, y: y + POSITION_JUMP };
         break;
       case Direction.West:
-        coordinates = { x: x - 10, y };
+        coordinates = { x: x - POSITION_JUMP, y };
         break;
       default:
         throw new Error("Unknown direction used to calculate new position.");
-    }
-
-    const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
-    if (!coordinatesWithinBounds) {
-      gameOver();
-      return { x: initialPosX, y: initialPosY };
     }
 
     return coordinates;
   }
 
   function move(): void {
-    const { x, y } = calculateNewPos(posX, posY, curDirection);
-    console.log(`x: ${x}, y: ${y}`);
-    posX = x;
-    posY = y;
+    const coordinates = calculateNewPos(posX, posY, curDirection);
+
+    // TODO: collision detection
+
+    const coordinatesWithinBounds: boolean = checkCoordinatesWithinBounds(coordinates);
+    if (!coordinatesWithinBounds) {
+      gameOver();
+    }
+
+    posX = coordinates.x;
+    posY = coordinates.y;
   }
 
   function startGame(): number {
@@ -111,8 +114,6 @@
   }
 
   function gameOver() {
-    console.log(`Game over. Score: ${score}`);
-
     gameEnd = true;
     ongoingGame = false;
 
@@ -131,6 +132,7 @@
 <main id="main">
   <Score {score} {highScore} />
   <Player {posX} {posY} length={playerLength ?? 50} />
+  <!-- TODO: add obstacles to the map -->
 </main>
 
 <style>
