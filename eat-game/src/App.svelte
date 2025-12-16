@@ -4,6 +4,8 @@
   import { Direction, type Coordinate } from "./lib/definitions";
   import Player from "./lib/Player.svelte";
   import Score from "./lib/Score.svelte";
+  import Target from "./lib/Target.svelte";
+  import { getRandomInteger } from "./utils/mathUtils";
 
   const height = $state(innerHeight.current);
   const width = $state(innerWidth.current);
@@ -24,10 +26,10 @@
   let score: number = $state(0);
   let highScore: number | undefined = $state();
 
-  // Player variables
+  // Movement variables
   let curDirection: Direction = $state(Direction.North);
-  let posX = $state(initialPosX);
-  let posY = $state(initialPosY);
+  let playerCoordinates: Coordinate = $state({ x: initialPosX, y: initialPosY });
+  let targetCoordinates: Coordinate = $state({ x: 0, y: 0 });
 
   function keyHandler(event: KeyboardEvent) {
     const keyName = event.key;
@@ -60,21 +62,21 @@
     return true;
   }
 
-  function calculateNewPos(x: number, y: number, direction: Direction): Coordinate {
+  function calculateNewPos(c: Coordinate, direction: Direction): Coordinate {
     let coordinates: Coordinate;
 
     switch (direction) {
       case Direction.North:
-        coordinates = { x, y: y - POSITION_JUMP };
+        coordinates = { x: c.x, y: c.y - POSITION_JUMP };
         break;
       case Direction.East:
-        coordinates = { x: x + POSITION_JUMP, y };
+        coordinates = { x: c.x + POSITION_JUMP, y: c.y };
         break;
       case Direction.South:
-        coordinates = { x, y: y + POSITION_JUMP };
+        coordinates = { x: c.x, y: c.y + POSITION_JUMP };
         break;
       case Direction.West:
-        coordinates = { x: x - POSITION_JUMP, y };
+        coordinates = { x: c.x - POSITION_JUMP, y: c.y };
         break;
       default:
         throw new Error("Unknown direction used to calculate new position.");
@@ -84,7 +86,9 @@
   }
 
   function move(): void {
-    const coordinates = calculateNewPos(posX, posY, curDirection);
+    const coordinates = calculateNewPos(playerCoordinates, curDirection);
+    playerCoordinates = coordinates;
+    console.log(`x: ${coordinates.x}, y: ${coordinates.y}`);
 
     // TODO: collision detection
 
@@ -92,13 +96,11 @@
     if (!coordinatesWithinBounds) {
       gameOver();
     }
-
-    posX = coordinates.x;
-    posY = coordinates.y;
   }
 
   function startGame(): number {
     document.addEventListener("keydown", (event) => keyHandler(event));
+    targetCoordinates = getRandomCoordinates();
 
     const scoreInterval: number = setInterval(() => {
       if (!ongoingGame) {
@@ -122,6 +124,15 @@
     }
   }
 
+  function getRandomCoordinates(): Coordinate {
+    let coordinates: Coordinate;
+    const x = getRandomInteger(LEFT_BOUNDARY, RIGHT_BOUNDARY - playerLength);
+    const y = getRandomInteger(TOP_BOUNDARY, BOTTOM_BOUNDARY - playerLength);
+
+    coordinates = { x, y };
+    return coordinates;
+  }
+
   onDestroy(() => {
     ongoingGame = false;
   });
@@ -131,8 +142,8 @@
 
 <main id="main">
   <Score {score} {highScore} />
-  <Player {posX} {posY} length={playerLength ?? 50} />
-  <!-- TODO: add obstacles to the map -->
+  <Player posX={playerCoordinates.x} posY={playerCoordinates.y} length={playerLength ?? 50} />
+  <Target x={targetCoordinates.x} y={targetCoordinates.y} length={playerLength ?? 50} />
 </main>
 
 <style>
