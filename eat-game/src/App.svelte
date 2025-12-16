@@ -100,6 +100,8 @@
 
   function startGame(): number {
     document.addEventListener("keydown", (event) => keyHandler(event));
+    
+    // Set initial target position
     targetCoordinates = getRandomCoordinates();
 
     const scoreInterval: number = setInterval(() => {
